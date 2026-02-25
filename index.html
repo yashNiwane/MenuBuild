@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Menu Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Restaurant Branding Suite</p>
+          <h1>Menu Studio</h1>
+          <p class="subtitle">Design beautiful menu pages from Excel or direct editing with print-ready fidelity.</p>
+        </div>
+        <div class="chip-row">
+          <span class="chip">Theme Presets</span>
+          <span class="chip">Excel Import</span>
+          <span class="chip">A4 Ready</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel controls-panel">
+          <div class="panel-head">
+            <h2>Menu Builder</h2>
+            <p id="statusText">Ready</p>
+          </div>
+
+          <div class="stats-grid">
+            <article><strong id="metricPages">0</strong><span>Pages</span></article>
+            <article><strong id="metricSections">0</strong><span>Sections</span></article>
+            <article><strong id="metricRows">0</strong><span>Rows</span></article>
+          </div>
+
+          <div class="control-grid">
+            <div class="control-group">
+              <label for="brandName">Restaurant Name</label>
+              <input id="brandName" type="text" placeholder="Aditya Champaran Hotel" />
+            </div>
+            <div class="control-group">
+              <label for="tagline">Tagline</label>
+              <input id="tagline" type="text" placeholder="Authentic Taste • Premium Dining" />
+            </div>
+            <div class="control-group">
+              <label for="footerText">Footer (address + contact)</label>
+              <input id="footerText" type="text" placeholder="Godown Chowk, Pune-Nashik Road, Moshi • Mob.: 8788520895" />
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="themePreset">Theme Preset</label>
+            <select id="themePreset">
+              <option value="royal">Royal Gold</option>
+              <option value="earth">Earth Clay</option>
+              <option value="night">Midnight Fine-Dine</option>
+              <option value="spice">Spice Street</option>
+            </select>
+          </div>
+
+          <div class="color-grid">
+            <div class="control-group">
+              <label for="bgColor">Background</label>
+              <input id="bgColor" type="color" value="#f2c94c" />
+            </div>
+            <div class="control-group">
+              <label for="headerColor">Section Bar</label>
+              <input id="headerColor" type="color" value="#5b2f22" />
+            </div>
+            <div class="control-group">
+              <label for="textColor">Text</label>
+              <input id="textColor" type="color" value="#1f1f1f" />
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="fileInput">Import Excel / CSV</label>
+            <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+            <small>Columns: Page, Section, Item, Half, Full, Item2, Half2, Full2</small>
+          </div>
+
+          <div class="control-group">
+            <label for="jsonInput">Import/Export JSON</label>
+            <textarea id="jsonInput" rows="6" placeholder='{"pages":[{"title":"Starters","sections":[{"name":"Veg","rows":[{"item":"Veg Crispy","half":"80/-","full":"130/-"}]}]}]}'></textarea>
+            <div class="button-row">
+              <button id="loadJsonBtn" type="button">Load JSON</button>
+              <button id="exportJsonBtn" class="secondary" type="button">Export JSON</button>
+            </div>
+          </div>
+
+          <div class="button-row main-actions">
+            <button id="addPageBtn" type="button">+ Add Page</button>
+            <button id="printBtn" class="primary" type="button">Print / Save PDF</button>
+          </div>
+
+          <div id="editor"></div>
+        </section>
+
+        <section class="panel preview-panel">
+          <div class="panel-head">
+            <h2>Live Restaurant Preview</h2>
+            <p>What you see is what prints</p>
+          </div>
+          <div id="previewPages" class="preview-pages"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="pageTemplate">
+      <article class="editor-page">
+        <div class="page-head">
+          <input class="page-title" type="text" placeholder="Page title (example: Starters, Main Course)" />
+          <button class="remove-page danger" type="button">Remove</button>
+        </div>
+        <div class="sections"></div>
+        <button class="add-section success" type="button">+ Add Section</button>
+      </article>
+    </template>
+
+    <template id="sectionTemplate">
+      <section class="editor-section">
+        <div class="section-head">
+          <input class="section-name" type="text" placeholder="Section name" />
+          <button class="remove-section danger" type="button">Remove</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item (left)</th>
+              <th>Half</th>
+              <th>Full</th>
+              <th>Item (right)</th>
+              <th>Half</th>
+              <th>Full</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button class="add-row success" type="button">+ Add Row</button>
+      </section>
+    </template>
+
+    <template id="rowTemplate">
+      <tr>
+        <td><input class="item" type="text" placeholder="Item" /></td>
+        <td><input class="half" type="text" placeholder="70/-" /></td>
+        <td><input class="full" type="text" placeholder="140/-" /></td>
+        <td><input class="item2" type="text" placeholder="Item" /></td>
+        <td><input class="half2" type="text" placeholder="70/-" /></td>
+        <td><input class="full2" type="text" placeholder="140/-" /></td>
+        <td><button class="remove-row danger" type="button">×</button></td>
+      </tr>
+    </template>
+  </body>
+</html>
