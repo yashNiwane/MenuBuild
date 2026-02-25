@@ -22,6 +22,7 @@
         <div class="chip-row">
           <span class="chip">Theme Presets</span>
           <span class="chip">Excel Import</span>
+          <span class="chip">Section Photos</span>
           <span class="chip">A4 Ready</span>
         </div>
       </header>
@@ -82,12 +83,12 @@
           <div class="control-group">
             <label for="fileInput">Import Excel / CSV</label>
             <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
-            <small>Columns: Page, Section, Item, Half, Full, Item2, Half2, Full2</small>
+            <small>Columns: Page, Section, Item, Half, Full, Item2, Half2, Full2, SectionImages</small>
           </div>
 
           <div class="control-group">
             <label for="jsonInput">Import/Export JSON</label>
-            <textarea id="jsonInput" rows="6" placeholder='{"pages":[{"title":"Starters","sections":[{"name":"Veg","rows":[{"item":"Veg Crispy","half":"80/-","full":"130/-"}]}]}]}'></textarea>
+            <textarea id="jsonInput" rows="6" placeholder='{"pages":[{"title":"Starters","sections":[{"name":"Veg","images":["https://..."],"rows":[{"item":"Veg Crispy","half":"80/-","full":"130/-"}]}]}]}'></textarea>
             <div class="button-row">
               <button id="loadJsonBtn" type="button">Load JSON</button>
               <button id="exportJsonBtn" class="secondary" type="button">Export JSON</button>
@@ -128,6 +129,10 @@
         <div class="section-head">
           <input class="section-name" type="text" placeholder="Section name" />
           <button class="remove-section danger" type="button">Remove</button>
+        </div>
+        <div class="control-group compact">
+          <label>Section image URLs (comma separated)</label>
+          <input class="section-images" type="text" placeholder="https://image1.jpg, https://image2.jpg" />
         </div>
         <table>
           <thead>

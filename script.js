@@ -37,29 +37,46 @@ const SAMPLE_MODEL = {
   brandName: 'Aditya Champaran Hotel',
   tagline: 'Authentic Taste • Premium Dining',
   footerText: 'Add.: Godown Chowk, Pune-Nashik Road, Moshi, Pune - 412105 • Mob.: 8788520895',
+  themePreset: 'royal',
   theme: PRESET_THEMES.royal,
   pages: [
     {
-      title: 'Starters',
+      title: 'Main Course',
       sections: [
         {
-          name: 'Veg Starter',
+          name: 'Chicken Main Course',
+          images: [
+            'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=500&q=60',
+            'https://images.unsplash.com/photo-1604908176997-43192fe862cd?auto=format&fit=crop&w=500&q=60',
+            'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500&q=60'
+          ],
           rows: [
-            { item: 'Veg Manchurian Dry', half: '70/-', full: '140/-', item2: 'Paneer Chilli Dry', half2: '100/-', full2: '180/-' },
-            { item: 'Veg Crispy', half: '80/-', full: '130/-', item2: 'Mushroom Chilli Dry', half2: '100/-', full2: '140/-' }
+            { item: 'Chicken Masala', half: '169/-', full: '-', item2: 'Chicken Kadai', half2: '279/-', full2: '-' },
+            { item: 'Chicken Fry', half: '169/-', full: '-', item2: 'Butter Chicken (H/F)', half2: '250/-', full2: '450/-' }
           ]
         },
         {
-          name: 'Nonveg Starter',
+          name: 'Mutton Main Course',
+          images: [
+            'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=500&q=60',
+            'https://images.unsplash.com/photo-1534939561126-855b8675edd7?auto=format&fit=crop&w=500&q=60'
+          ],
           rows: [
-            { item: 'Chicken Chilli Dry', half: '100/-', full: '180/-', item2: 'Chicken Lollipop', half2: '100/-', full2: '200/-' },
-            { item: 'Chicken Garlic Butter', half: '120/-', full: '220/-', item2: 'Chicken Crispy', half2: '100/-', full2: '180/-' }
+            { item: 'Mutton Handi H/F', half: '399/-', full: '679/-', item2: 'Mutton Kolhapuri', half2: '249/-', full2: '-' },
+            { item: 'Mutton Curry', half: '249/-', full: '-', item2: 'Mutton Malwani (H/F)', half2: '449/-', full2: '699/-' }
           ]
         }
       ]
     }
   ]
 };
+
+function parseImageList(value = '') {
+  return String(value)
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
 function cloneRow(row = {}) {
   return {
@@ -90,9 +107,10 @@ function addRow(tbody, row = {}) {
   tbody.appendChild(tr);
 }
 
-function addSection(container, section = { name: '', rows: [] }) {
+function addSection(container, section = { name: '', images: [], rows: [] }) {
   const sectionEl = sectionTemplate.content.firstElementChild.cloneNode(true);
   sectionEl.querySelector('.section-name').value = section.name || '';
+  sectionEl.querySelector('.section-images').value = (section.images || []).join(', ');
   const tbody = sectionEl.querySelector('tbody');
 
   if (section.rows?.length) {
@@ -102,6 +120,7 @@ function addSection(container, section = { name: '', rows: [] }) {
   }
 
   sectionEl.querySelector('.section-name').addEventListener('input', renderPreview);
+  sectionEl.querySelector('.section-images').addEventListener('input', renderPreview);
   sectionEl.querySelector('.add-row').addEventListener('click', () => {
     addRow(tbody, cloneRow());
     renderPreview();
@@ -152,6 +171,7 @@ function buildModelFromEditor() {
 
       return {
         name: sectionEl.querySelector('.section-name').value.trim() || 'Untitled Section',
+        images: parseImageList(sectionEl.querySelector('.section-images').value),
         rows
       };
     });
@@ -227,6 +247,9 @@ function renderPreview() {
       });
       sectionEl.appendChild(header);
 
+      const sectionBody = document.createElement('div');
+      sectionBody.className = 'section-body';
+
       const body = document.createElement('div');
       body.className = 'section-rows';
 
@@ -248,7 +271,24 @@ function renderPreview() {
         });
       });
 
-      sectionEl.appendChild(body);
+      sectionBody.appendChild(body);
+
+      if (section.images?.length) {
+        const gallery = document.createElement('aside');
+        gallery.className = 'section-gallery';
+
+        section.images.slice(0, 6).forEach((url) => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = `${section.name} dish`;
+          img.loading = 'lazy';
+          gallery.appendChild(img);
+        });
+
+        sectionBody.appendChild(gallery);
+      }
+
+      sectionEl.appendChild(sectionBody);
       pageEl.appendChild(sectionEl);
     });
 
@@ -303,19 +343,11 @@ function normalizeSheetRows(rows) {
     const sectionName = get(row, ['section', 'category', 'group']) || 'Imported Section';
     const itemLeft = get(row, ['item', 'leftitem', 'dish']);
     const itemRight = get(row, ['item2', 'rightitem', 'dish2']);
+    const imageField = get(row, ['sectionimages', 'images', 'imageurls', 'photos']);
 
-    if (!itemLeft && !itemRight) {
+    if (!itemLeft && !itemRight && !imageField) {
       return;
     }
-
-    const sectionRow = {
-      item: itemLeft || '',
-      half: get(row, ['half', 'pricehalf', 'leftpricehalf']) || '',
-      full: get(row, ['full', 'pricefull', 'leftpricefull']) || '',
-      item2: itemRight || '',
-      half2: get(row, ['half2', 'pricehalf2', 'rightpricehalf']) || '',
-      full2: get(row, ['full2', 'pricefull2', 'rightpricefull']) || ''
-    };
 
     if (!pagesMap.has(pageName)) {
       pagesMap.set(pageName, new Map());
@@ -323,15 +355,32 @@ function normalizeSheetRows(rows) {
 
     const sections = pagesMap.get(pageName);
     if (!sections.has(sectionName)) {
-      sections.set(sectionName, []);
+      sections.set(sectionName, { rows: [], images: new Set() });
     }
 
-    sections.get(sectionName).push(sectionRow);
+    const sectionData = sections.get(sectionName);
+
+    parseImageList(imageField).forEach((img) => sectionData.images.add(img));
+
+    if (itemLeft || itemRight) {
+      sectionData.rows.push({
+        item: itemLeft || '',
+        half: get(row, ['half', 'pricehalf', 'leftpricehalf']) || '',
+        full: get(row, ['full', 'pricefull', 'leftpricefull']) || '',
+        item2: itemRight || '',
+        half2: get(row, ['half2', 'pricehalf2', 'rightpricehalf']) || '',
+        full2: get(row, ['full2', 'pricefull2', 'rightpricefull']) || ''
+      });
+    }
   });
 
   const pages = Array.from(pagesMap.entries()).map(([title, sectionMap]) => ({
     title,
-    sections: Array.from(sectionMap.entries()).map(([name, sectionRows]) => ({ name, rows: sectionRows }))
+    sections: Array.from(sectionMap.entries()).map(([name, sectionData]) => ({
+      name,
+      images: Array.from(sectionData.images),
+      rows: sectionData.rows
+    }))
   }));
 
   return {

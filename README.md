@@ -1,25 +1,19 @@
 # Restaurant Menu Studio
 
-Restaurant-first menu builder with modern UI/UX and print-ready output.
+Restaurant-first menu builder with modern royal UI/UX, section photos, and print-ready output.
 
-## UX improvements made
+## What you can do
 
-- Restaurant-inspired visual hierarchy with premium typography and elegant hero header.
-- Theme presets for common restaurant styles:
+- Create restaurant menus from direct editing.
+- Import menu data from Excel/CSV row + column structure.
+- Add **section images** (dish photos) so menu looks like professional posters.
+- Use theme presets:
   - Royal Gold
   - Earth Clay
   - Midnight Fine-Dine
   - Spice Street
-- Cleaner builder controls with live metrics (pages, sections, rows).
-- Better editing ergonomics for pages/sections/rows.
-- High-quality A4 print preview suitable for PDF export.
-
-## Functional features
-
-- Build menus directly in the interface.
-- Import from Excel/CSV row+column data.
-- Import/export JSON template model.
-- Multi-page support with two-column section rows (left/right items + half/full pricing).
+- Import/export full JSON templates.
+- Print to A4/PDF with WYSIWYG preview.
 
 ## Run
 
@@ -39,11 +33,11 @@ Open: `http://localhost:4173`
 - `Item2`
 - `Half2`
 - `Full2`
+- `SectionImages` (comma-separated URLs)
 
 Example:
 
-| Page | Section | Item | Half | Full | Item2 | Half2 | Full2 |
-|---|---|---|---|---|---|---|---|
-| Starters | VEG STARTER | Veg Manchurian Dry | 70/- | 140/- | Paneer Chilli Dry | 100/- | 180/- |
-| Starters | VEG STARTER | Veg Crispy | 80/- | 130/- | Mushroom Chilli Dry | 100/- | 140/- |
-| Starters | NONVEG STARTER | Chicken Chilli Dry | 100/- | 180/- | Chicken Lollipop | 100/- | 200/- |
+| Page | Section | Item | Half | Full | Item2 | Half2 | Full2 | SectionImages |
+|---|---|---|---|---|---|---|---|---|
+| Main Course | CHICKEN MAIN COURSE | Chicken Masala | 169/- | - | Chicken Kadai | 279/- | - | https://img1.jpg, https://img2.jpg |
+| Main Course | MUTTON MAIN COURSE | Mutton Curry | 249/- | - | Mutton Malwani (H/F) | 449/- | 699/- | https://img3.jpg |
